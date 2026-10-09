@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EducaSure Resource Hub</title>
+<link rel="icon" href="logo.png">
+</head>
+<body>
+<style>
+  :root{
+    --bg:#F6F7FA;
+    --surface:#FFFFFF;
+    --surface-2:#F1F3F7;
+    --border:#DEE2EA;
+    --text:#16233C;
+    --text-muted:#5B6472;
+    --accent:#16233C;
+    --accent-ink:#0F1729;
+    --accent-2:#D9A23E;
+    --accent-soft:#EEF1F6;
+    --folder:#16233C;
+    --doc:#3C6693;
+    --sheet:#2E7D53;
+    --pdf:#9C4234;
+    --focus:#D9A23E;
+    --radius:10px;
+    --shadow:0 1px 2px rgba(16,25,45,.06),0 6px 20px -10px rgba(16,25,45,.16);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0F1826;
+      --surface:#16212F;
+      --surface-2:#1B2736;
+      --border:#2A3849;
+      --text:#EDEFF3;
+      --text-muted:#98A2B4;
+      --accent:#8FB2D9;
+      --accent-ink:#C2D7EE;
+      --accent-2:#E5B45C;
+      --accent-soft:#20304A;
+      --folder:#8FB2D9;
+      --doc:#7CA8DE;
+      --sheet:#7FCB9E;
+      --pdf:#E0897A;
+      --focus:#E5B45C;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -10px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0F1826;
+    --surface:#16212F;
+    --surface-2:#1B2736;
+    --border:#2A3849;
+    --text:#EDEFF3;
+    --text-muted:#98A2B4;
+    --accent:#8FB2D9;
+    --accent-ink:#C2D7EE;
+    --accent-2:#E5B45C;
+    --accent-soft:#20304A;
+    --folder:#8FB2D9;
+    --doc:#7CA8DE;
+    --sheet:#7FCB9E;
+    --pdf:#E0897A;
+    --focus:#E5B45C;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px -10px rgba(0,0,0,.5);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Plus Jakarta Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding-inline:16px;
+    padding-block:28px 64px;
+  }
+  a{color:inherit;}
+  h1,h2,h3{font-family:"Plus Jakarta Sans", -apple-system, "Segoe UI", Roboto, sans-serif; text-wrap:balance; margin:0;}
+  .wrap{max-width:960px; margin:0 auto;}
+
+  header.hub{
+    display:flex; align-items:center; gap:16px;
+    margin-bottom:26px;
+  }
+  header.hub .brand-mark{
+    flex:none; display:flex; align-items:center; justify-content:center;
+    background:#FFFFFF; border:1px solid var(--border);
+    border-radius:12px; padding:8px 12px; box-shadow:var(--shadow);
+  }
+  header.hub .brand-logo{
+    height:44px; width:auto; display:block;
+  }
+  header.hub h1{font-size:clamp(24px,4.5vw,32px); font-weight:800; color:var(--text); letter-spacing:-.01em;}
+
+  .search-row{
+    position:sticky; top:env(safe-area-inset-top,0px);
+    background:var(--bg);
+    padding-block:10px;
+    z-index:5;
+    display:flex; gap:10px; align-items:center;
+    border-bottom:1px solid var(--border);
+  }
+  .search-row input{
+    flex:1;
+    font:inherit; font-size:15px;
+    padding:10px 14px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+  }
+  .search-row input:focus{outline:2px solid var(--focus); outline-offset:1px;}
+  .count-pill{
+    font-family:"IBM Plex Mono", monospace; font-size:12px; color:var(--text-muted);
+    white-space:nowrap;
+  }
+
+  .quick-grid{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:10px; margin:22px 0 30px;
+  }
+  .quick-card{
+    display:flex; flex-direction:column; gap:8px;
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:14px 16px;
+    text-decoration:none; box-shadow:var(--shadow);
+    transition:transform .12s ease, border-color .12s ease;
+  }
+  .quick-card:hover{transform:translateY(-2px); border-color:var(--accent-2);}
+  .quick-card:focus-visible{outline:2px solid var(--focus); outline-offset:2px;}
+  .quick-card .qc-top{display:flex; align-items:center; gap:8px;}
+  .quick-card .qc-title{font-weight:600; font-size:14.5px;}
+  .quick-card .qc-desc{font-size:12.5px; color:var(--text-muted); line-height:1.4;}
+
+  section.groupblock{margin-bottom:8px;}
+  .group-heading{
+    display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
+    margin:34px 0 6px;
+  }
+  .group-heading h2{font-size:20px; font-weight:600;}
+  .group-note{
+    font-size:13px; color:var(--text-muted); margin:0 0 14px; max-width:64ch; line-height:1.5;
+  }
+
+  details.section-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    margin-bottom:10px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  details.section-card[open] summary{border-bottom:1px solid var(--border);}
+  summary.section-summary{
+    list-style:none; cursor:pointer;
+    display:flex; align-items:center; gap:12px;
+    padding:14px 16px;
+    font-weight:600; font-size:15.5px;
+  }
+  summary.section-summary::-webkit-details-marker{display:none;}
+  summary.section-summary .chev{
+    margin-left:auto; color:var(--text-muted);
+    transition:transform .15s ease; flex:none;
+  }
+  details[open] > summary .chev{transform:rotate(90deg);}
+  summary.section-summary .root-link{
+    margin-left:auto;
+    font-family:"IBM Plex Mono", monospace; font-size:11.5px;
+    color:var(--accent-ink); text-decoration:none;
+    border:1px solid var(--border); border-radius:999px;
+    padding:4px 10px; white-space:nowrap;
+  }
+  summary.section-summary .root-link:hover{border-color:var(--accent-2);}
+  summary.section-summary .item-count{
+    font-family:"IBM Plex Mono", monospace; font-size:11.5px; color:var(--text-muted); font-weight:400;
+  }
+
+  .item-list{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:8px; padding:14px 16px 18px; background:var(--surface-2);
+  }
+  .item-link{
+    display:flex; gap:9px; align-items:flex-start;
+    padding:9px 10px; border-radius:8px;
+    text-decoration:none; color:var(--text);
+    border:1px solid transparent;
+  }
+  .item-link:hover{background:var(--surface); border-color:var(--border);}
+  .item-link:focus-visible{outline:2px solid var(--focus); outline-offset:1px;}
+  .item-link svg{flex:none; margin-top:2px;}
+  .item-text .item-label{font-size:13.5px; line-height:1.35; font-weight:500;}
+  .item-text .item-label,.item-text .item-note{display:block;}
+  .item-text .item-note{font-size:11.5px; color:var(--text-muted); margin-top:2px; line-height:1.4;}
+
+  .item-group{
+    grid-column:1 / -1;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:var(--surface);
+    overflow:hidden;
+  }
+  .item-group-head{
+    display:flex; align-items:center; gap:8px;
+    padding:8px 10px;
+    background:var(--accent-soft);
+    font-size:13px; font-weight:600;
+  }
+  .item-group-head svg{flex:none;}
+  .item-group-label{margin-right:auto;}
+  .root-link.small{
+    font-family:"IBM Plex Mono", monospace; font-size:10.5px;
+    color:var(--accent-ink); text-decoration:none;
+    border:1px solid var(--border); border-radius:999px;
+    padding:2px 8px; white-space:nowrap; flex:none;
+  }
+  .root-link.small:hover{border-color:var(--accent-2);}
+  .item-group-body{
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+    gap:6px; padding:8px;
+  }
+  .item-group-body .item-link{padding:7px 8px;}
+  .item-group-body .item-label{font-size:12.5px;}
+
+  .subgroup-title{
+    font-family:"IBM Plex Mono", monospace; font-size:11px; letter-spacing:.06em;
+    text-transform:uppercase; color:var(--text-muted);
+    padding:12px 16px 0;
+  }
+
+  footer.hub{
+    margin-top:40px; padding-top:16px; border-top:1px solid var(--border);
+    color:var(--text-muted); font-size:12.5px; line-height:1.6;
+  }
+  [hidden]{display:none !important;}
+
+  /* ===== EducaSure brand theme (matches Learner Onboarding Study Guide) ===== */
+  :root{
+    --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F2F4F8; --border:#D9DEE7;
+    --text:#1F2937; --text-muted:#5B6474;
+    --navy:#0B2142; --navy-2:#0D354E; --gold:#E5A93B; --gold-ink:#B77D14; --gold-bg:#FDF6E8;
+    --accent:#0B2142; --accent-ink:#0B2142; --accent-2:#E5A93B; --accent-soft:#FDF6E8;
+    --folder:#0B2142; --focus:#E5A93B; --radius:2px;
+    --shadow:none;
+    --serif:Caladea, Cambria, Georgia, serif; --sans:Inter, "Segoe UI", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B1524; --surface:#111D30; --surface-2:#16243A; --border:#26364F;
+      --text:#E8ECF2; --text-muted:#9AA6B8; --navy:#0B2142;
+      --accent:#9DB7DA; --accent-ink:#DCE5F2; --accent-2:#E5A93B; --accent-soft:#2A2414;
+      --gold-bg:#2A2414; --gold-ink:#E5B45C; --folder:#9DB7DA; --focus:#E5A93B;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B1524; --surface:#111D30; --surface-2:#16243A; --border:#26364F;
+    --text:#E8ECF2; --text-muted:#9AA6B8; --navy:#0B2142;
+    --accent:#9DB7DA; --accent-ink:#DCE5F2; --accent-2:#E5A93B; --accent-soft:#2A2414;
+    --gold-bg:#2A2414; --gold-ink:#E5B45C; --folder:#9DB7DA; --focus:#E5A93B;
+  }
+  body{font-family:var(--sans); background:var(--bg);}
+  h1,h2,h3{font-family:var(--sans);}
+
+  header.hub{display:block; margin-bottom:18px;}
+  header.hub .logo-row{margin-bottom:12px;}
+  header.hub .brand-logo{height:40px; width:auto; display:block; background:#fff; padding:4px 6px;}
+  .banner{background:linear-gradient(115deg,#0B2142 0%,#0D354E 60%,#123F5C 100%); color:#fff; padding:22px 24px 20px;}
+  .banner .eyebrow{font-family:var(--sans); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--gold);}
+  .banner h1{color:#fff !important; font-size:clamp(26px,4.5vw,34px); font-weight:700; margin:6px 0 4px;}
+  .banner p{margin:0; color:#D6DEEA; font-size:14px; line-height:1.5; max-width:70ch;}
+  .banner .meta{display:flex; gap:28px; flex-wrap:wrap; margin-top:16px; padding-top:12px; border-top:1px solid rgba(255,255,255,.18);}
+  .banner .meta div{font-size:10.5px; color:#AEBBD0; letter-spacing:.08em; text-transform:uppercase; font-weight:600;}
+  .banner .meta b{display:block; color:#fff; font-size:13px; letter-spacing:0; text-transform:none; margin-top:2px;}
+
+  .search-row{border-bottom:2px solid var(--navy);}
+  .search-row input{border-radius:2px; border:1px solid var(--border); font-family:var(--sans);}
+  .count-pill{font-family:var(--sans); font-weight:600; color:var(--gold-ink);}
+
+  .quick-grid{gap:3px; margin:18px 0 28px;}
+  .quick-card{background:var(--navy); border:0; border-top:3px solid var(--gold); border-radius:2px; box-shadow:none; color:#fff;}
+  .quick-card:hover{transform:translateY(-2px); background:#0D2A50; border-color:var(--gold);}
+  .quick-card .qc-title{color:#fff; font-weight:700;}
+  .quick-card .qc-desc{color:#C6D0DF;}
+  .quick-card svg{stroke:var(--gold);}
+  .quick-card svg *{stroke:var(--gold);}
+
+  .group-heading{margin:30px 0 6px; padding-left:10px; border-left:4px solid var(--gold);}
+  .group-heading h2{font-family:var(--serif); font-size:22px; font-weight:700; color:var(--accent-ink);}
+
+  details.section-card{border-radius:2px; box-shadow:none; border:1px solid var(--border); border-left:4px solid var(--gold);}
+  summary.section-summary{font-family:var(--serif); font-size:18px; font-weight:700; color:var(--accent-ink);}
+  details.section-card[open] summary{border-bottom:1px solid var(--border);}
+  summary.section-summary .item-count{font-family:var(--sans); font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--gold-ink);}
+  summary.section-summary .root-link{font-family:var(--sans); font-weight:600; border-radius:2px; background:var(--navy); color:#fff; border:0; padding:5px 10px;}
+  summary.section-summary .root-link:hover{background:#0D2A50;}
+
+  .item-list{background:var(--surface-2);}
+  .item-link{border-radius:2px;}
+  .item-link:hover{background:var(--surface); border-color:var(--border); border-left:3px solid var(--gold); padding-left:8px;}
+  .item-group{border-radius:2px;}
+  .item-group-head{background:var(--navy); color:#fff; font-family:var(--sans);}
+  .item-group-head svg, .item-group-head svg *{stroke:var(--gold);}
+  .root-link.small{font-family:var(--sans); font-weight:600; border-radius:2px; color:#fff; border:1px solid rgba(255,255,255,.35);}
+  .root-link.small:hover{border-color:var(--gold);}
+
+  footer.hub{border-top:2px solid var(--navy); font-family:var(--serif); font-size:13.5px;}
+  footer.hub strong{color:var(--accent-ink);}
+</style>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Caladea:wght@400;700&display=swap">
+
+<div class="wrap">
+  <header class="hub">
+    <div class="logo-row"><img class="brand-logo" src="logo.png" alt="EducaSure"></div>
+    <div class="banner">
+      <div class="eyebrow">EducaSure · Staff resources</div>
+      <h1>Resource Hub</h1>
+      <p>Course materials, EISA past papers, templates, registers and learner onboarding, all in one place.</p>
+      <div class="meta"><div>Library<b>EducaSure SharePoint</b></div><div>New<b>Learner Onboarding</b></div><div>IT help<b>shantel@educasure.co.za</b></div></div>
+    </div>
+  </header>
+
+  <div class="search-row">
+    <input id="search" type="text" placeholder="Search course codes, documents, folders…" aria-label="Filter links">
+    <span class="count-pill" id="resultCount"></span>
+  </div>
+
+  <div class="quick-grid" id="quickGrid"></div>
+
+  <div id="sections"></div>
+
+  <footer class="hub">
+    Most links point into the <strong>EducaSure Sharepoint</strong> site library; the Learner Onboarding quizzes and study guide are hosted on this page. If a link opens but says you need access, ask the site owner to add you — the folder structure itself hasn't changed. Have a folder missing from this page? Use "Copy Link" on it in SharePoint and send it over to add it here.
+  </footer>
+</div>
+
+<script>
+(function(){
+  const ICONS = {
+    folder: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--folder)" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg>',
+    doc: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--doc)" stroke-width="1.8"><path d="M6 2h8l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v4h4" /><path d="M8 13h8M8 17h5" stroke-width="1.5"/></svg>',
+    sheet: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sheet)" stroke-width="1.8"><path d="M6 2h8l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v4h4"/><path d="M8 12h8M8 16h8M11 12v6" stroke-width="1.5"/></svg>',
+    pdf: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--pdf)" stroke-width="1.8"><path d="M6 2h8l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/><path d="M14 2v4h4"/><path d="M8 15c0-1.2 1-2 2.2-2H11c1 0 1.7.8 1.7 1.7 0 1-.7 1.8-1.7 1.8H8v-1.5Z" stroke-width="1.3"/></svg>',
+    quiz: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--accent-2)" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="m8 9 1.5 1.5L12 8M8 15l1.5 1.5L12 14M14 9h3M14 15h3" stroke-width="1.5"/></svg>',
+    onedrive: '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8"><path d="M7 17a4 4 0 0 1-.4-7.98A5.5 5.5 0 0 1 17.1 8.4 4.2 4.2 0 0 1 17 17H7Z"/></svg>'
+  };
+  function typeFromUrl(url){
+    if(/\.pdf$/i.test(url)) return 'pdf';
+    if(/\.html$/i.test(url)) return 'quiz';
+    if(/\/:f:\//.test(url)) return 'folder';
+    if(/\/:x:\//.test(url)) return 'sheet';
+    if(/\/:b:\//.test(url)) return 'pdf';
+    if(/\/:w:\//.test(url) || /\/:p:\//.test(url)) return 'doc';
+    return 'doc';
+  }
+
+  const QUICK = [
+    {label:'Learner Onboarding Quizzes', desc:'Practice quizzes for the 8 onboarding modules. Opens in the browser, works on a phone.', url:'onboarding-quiz.html', type:'quiz'},
+    {label:'Master Library Index', desc:'Every course: credits, WM/KM/PM breakdown, which document to use for facilitators, new learners, materials & support.', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQAZoNpgFSDRTZnA0n9KgPJgAXf765N8Jq6KBFcVNivZcJo?e=Z2J3R6', type:'doc'},
+    {label:'EducaSure Prospectus 2026–2027', desc:'Comprehensive prospectus document.', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQBlz3Ph9GmdQpvUUchb0INtARPbBp8teZRutvzg-rzu88g?e=A3lLvA', type:'doc'},
+    {label:'My OneDrive Files', desc:'Your personal "My files" area.', url:'https://educasurework.sharepoint.com/_layouts/15/sharepoint.aspx/onedrive/my', type:'onedrive'},
+    {label:'EISA Past Papers', desc:'Root folder — all qualifications.', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBLthV9kvJ7SpGMorPhDbn2ARVQ_LnwoKrmbbK_skybrCM?e=G6LkYS', type:'folder'}
+  ];
+
+  const SECTIONS = [
+    {
+      title:'Learner Onboarding', open:true,
+      items:[
+        {label:'Onboarding Practice Quizzes', note:'8 modules · 10 questions each · pass mark 8/10 · unlimited attempts.', url:'onboarding-quiz.html'},
+        {label:'Learner Onboarding Study Guide.pdf', note:'Read before the quizzes. Covers every quiz answer and lists contact details.', url:'onboarding-study-guide.pdf'}
+      ]
+    },
+    {
+      title:'EISA Past Papers', open:true,
+      root:{label:'00 EISA Past Papers', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBLthV9kvJ7SpGMorPhDbn2ARVQ_LnwoKrmbbK_skybrCM?e=G6LkYS'},
+      items:[
+        {label:'105021 Investment Adviser', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBajs-yCwmqSLGKXS5YFWfmAbLalC_91c6SsKmb__oHJNw?e=NIbjio', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCaWkRExc2kQppCvOgoH9yLASV3AaBJ4KmeO2m0g4ALtts?e=JYCvXx'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgARGTAh1W1YRq69rb21wX5wAYPKlbsf-RCqf04k8cTc4JM?e=NpPI0m'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB_jQ0NTYvwT6KlFGEDxKheAcwBsXtyCjZpx2832MjUVjw?e=46dO0V'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBQ322BRl9dQ6RHGFpPlyUbATEjXtRsoiGnSsnFPvcv-uY?e=qqhIj5'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCGAI_bgs62Q66GGTzvmEP5AThrRFEGEAMNcuyOKZt0Dfo?e=ndbEeY'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBI3IvuOsNOQ5IJqaUeCY-TARJDjLDZYiu-MSyZxbeLviY?e=9ZGxwu'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA01P_i6VnNR6_WZ1Wn0_xMAQTJqk4DS5UQ-VjGR0ZDMOQ?e=DtRr2E'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCKueNDD0bbQahEVVUG4Sg3AVSR8HsSYtPxPepajVvdwdo?e=YSeX6u'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBEidOt0cROQqQBJTqeJktMAQfaOTk-PTmS3gEpq94tiyg?e=pIP2W6'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBlhYqDiox9S6_TLctT8VPOAb0kIQuii3JFA-JBdB7Gnyg?e=bgXpne'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAeRVoUwKZzRYVG89-LDJxQAXsXS_jH7YatxemqNq-ac0o?e=lk1Yyv'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAP4B_r_bHeQYsQMPPaS-baAaXJsuLVHkC06n6HaBaKUpg?e=wYHRDQ'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA938BY6IFCSo1V_PFY7hPLATSONGuJ-R-tHphuR8bWS30?e=nnhiYe'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC7sfnfVGCPS7--vJBAaBVCATKoACXQqK_TKfj3LisfEL0?e=XzSYoP'}
+        ]},
+        {label:'105022 Long-Term Insurance Adviser', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDmpQAkAtmqR7UZdca5EOxWAY5AmRDgrvPdcGMleQZUZYs?e=d1LUb0', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDjG7jBBUrLRIps1EfdC8MLATgl1GZN_FqayPVjmj0UwJc?e=npSob3'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDYzPVBtWPZTLFTV_GhckzIATEEAsHjcDT5B9oqwsxPmx0?e=57SQUk'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBvgYcSCU43SZbCR2VMFm13Aa6EQMIizf-JdiVjfu7tJPI?e=7cmkcB'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCEjKyygBlUQLzSgkXuCvg9AbfyNlwy8R4avQ2Giu96fK8?e=bDcTyI'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCfDjUjmvEHSZpEyoNvjSduAX2nmMH6hfMpeHL-DUegLT8?e=7BXgf9'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC0f-RFrbaBRboEGPkLS0oTAeYMq-KzaGpKoHkdj2uuad8?e=gkguA2'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCzexTVb8I5RpcwPbG_IhBnAShCTr_8umx0L-3IhAGuYng?e=7VZyXA'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCcczXPQ-MdTY1Ai-b2AgqMAfekIEiZz6-QSJqps2bZPFA?e=caELsZ'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDouHA6iet5QKIzeLCswOl6Afr_eh5UPw8y29gNqr1bctk?e=pbB9QI'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBKfFF81nC7QKgNzcYbUH-4AWlIpj3-8SmuEhC2hdS2QA0?e=BcYeHA'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDqeygXe76gQ6wmoZiIootqAafq5IB4wE1yy6oeanawVdw?e=nC9LUj'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDqsU6EbSZHSb1fJvgw18sbAZz7k7_lBw9ZFRa_AwOa8Ho?e=UBxuja'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCSoUJnmkcYTqyUWgwPe6raAXt6FJtfYr7Q8cwBRG12TFM?e=vT63ZE'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAaHg2lWZXsSZFDyhPXgItmAYd-HLG8PFDjCXia9cc7Uw0?e=fqoU2E'}
+        ]},
+        {label:'105025 Employee & Pension Fund Benefit Adviser', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDfj2rtg-9_Tat9RqcfN7eUAVpTdsDe567Rvqi-ar3_IGY?e=TObWv8', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA_HByW5hG8RbHYqsIOh_5AAWt22P4tOsb0oeMoh_U01pg?e=R0ktKG'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDNA3ptExUeSokHooWjxXndARusOiN_ntI4gE1eSubekpg?e=wpvK1a'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDwK_PnAuYPToDdJPtF4LUJATamObDL9wFbgfd5XvacW2Y?e=fPGJdZ'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBSVhtEq-yVQI3mJ2H7v43eAUZGsXieHDyrSZpRZ1oxj30?e=RigtYv'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBEUjlRqfqcTaf74QJLQUuFAU-8MumogyxTaeAkqubiUcU?e=Aw1d8q'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBvS08QjROES4fqwdDAxma0ARPlbqZ6EhfEBYXLZQwx74E?e=2DxRDh'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA7Vj12c_McSYmdPsZS31v3ASBL1LwQLaGs1t4XN6hE4BY?e=9pGkOo'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCF2DXQUpRqR6Q3ugAm8y9oAbX-jZpkHJKAR4WCWmFdLwY?e=GVs0vg'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAB_nLf8u-DTKP0GyIdPGELAfCkvnidGlNyVD72uE-Ki5Q?e=Ybs17Y'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDvTefzQTO3RLYfMmT74sDhARHuk9M8gWPb9wftM6EXDlI?e=trSUgf'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDVwtYxDyv3Tbt6z2iCJAyBAUuf4vbwEed4iI3bHkxvYC4?e=XtbVcE'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCUje_UBdNURJ5Pb1ye-fxbAbNPi8TrVW_KA-oI1Z_KN3I?e=9nOznT'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBpBj6tP3zaT7KrqMThHmH8AWJm5EYJ8mNl38DAgaDd_pE?e=yJa6vr'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC9j_UrizwdSYTf6_W5-LWFAan6L31s3dcxqBerfnK4WNg?e=Yjs2VU'}
+        ]},
+        {label:'105030 Healthcare Benefits Adviser', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAjYTDB8ls0R7bBcpVSEDTpAVS934ck16dIZU3vgoKI4cQ?e=NRwi97', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBML4R4E6hKRIjKj8vPY6U4AZg_s8A0FXzEmZ8PMOpN2rU?e=DtSAXx'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgByWB_6HZYsTLh1nROlBJhgAb5fuPnEmrN_DCeGkD5JsTs?e=9681AS'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBikcUUcCMjRaEKUQ9PcGNdAeg1DBEeP4sQJXJJEjkoKcg?e=H4Ptav'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBriEatK-NYSbAOlQyj8bHzAaiF1BLa6sM7651NL-Vg1G0?e=uoois5'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC6QZ4lJx5FRovxuFqFYv-GARNyS-pSQWuV4qdHKDRPs1g?e=wUJtjd'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCyZdwsZDioS6SkcFt5-QXjARtLICAZEcl64WNuMIFAQ-0?e=VkdbB1'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAhP9j62ivLTqeRc816qN16AXSHwP0jKRx1B_GzsbWynW8?e=Hy8X3b'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBO9fwToU2tQ5VopGDRHqpqAd1a0ln0pZSl1-0aQ0tFzdE?e=KFZSOb'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBnoomeJEPRQZLbyLNa_0pgAe5PCrdmc3kzn4nMe3Eysys?e=kuo53V'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB0lrdNF5FASbu77nWdxL4RAf-UBlI_eGwWrNrZ6YjGTXM?e=mm73R3'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAFNswhF9JdSYp3t0MvaRmlAckNBQoxps8YT3QJTzswDdA?e=bbZJdh'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC_dKxKuUvkQ6gKfqTGc_y_AUhO63klP2am7hSTtEaKEfs?e=YLH8ju'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAKflt-jHP2RKc8xn_2vZ6EASdN3R9jtIXOlNbTU0yefTw?e=qlbteR'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgD70BxpKO1yR5ZPOQ363KwYAfqCQ9l2_kg72SwObVycVcI?e=Wyt5L3'}
+        ]},
+        {label:'117329 Insurance Underwriter', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDiH2wKTjwdQL1ntP9PzGTTAYSFeORcDYCO1oODHqUzpLs?e=VTVbCU', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC5Twg5hKn_RoIPhplcN8QCAfL4zxgFbVSechu90mG-VrQ?e=GJjHaJ'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA1ZEZwd869RIEmhHXgpvCbAUCets-diZ5Mjopq9DJxCA4?e=6gjUgf'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDahpRVhiTCTJn0SWG5fE-qAZhimGVhlSEmLAO-fRK_tkU?e=ek5Bqv'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB0GKrSTeUkQrtAotwd0Sy0ARP-w454F5ArhZbeDbcLYeU?e=4hECE7'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDmZY5keLbvR4NgUAfFYSIZAQVINJwgM0xMdrVb-5ZgF2M?e=bYltAk'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDrLBisHAdhRaFY5bbwxfOuARVlSqlXzPDKiNzaAjUVBmE?e=i92jeu'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBQfQGqe8WVRrIB_HEWWNreAYJVCmp08bRJpJjMY4kVoA4?e=sl124w'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB68CYMwIUAR6Wi2KoMKzmRAfU5zLqfMaUoxt1VvECA36U?e=fhv9Jr'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAnPIZt-dCCR5a7MN-SCZXTAZMeAtLDMNryT-t95QZNnAw?e=WCqc84'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB7QMtker4BQprkV6aT0jB4AW8Xsi6i4cPo-SpbL6pp5zc?e=ikV8oR'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAERSPL8Z0-RaohubJ-vbxtAZnPdTA_LDGTwVPIcNesCS8?e=93hEDr'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDsns1qz3-jTrTRwlI8AM6eAamKzOPuoCqd5i-gYzoNgq0?e=LMPmfM'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDDM_DWOdtQQp4eUlNevJ5vAY_Nyyv5DSHfRlhvjmOA50A?e=cC6hqr'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBI_1HaDLoVRq415tQ9fyopAb3L9XXKlMJt9i0xUd1t-vc?e=n6LjDG'}
+        ]},
+        {label:'99668 Insurance Claims Assessor', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgD-C2TwpbKZQqZgik6mD-CzASXyd1_oarIal5mtmfo_WPU?e=52q8oH', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA2tT9dK6cAQ4e7rWjtLhuoAZj7sUjbFEX7ncJ8AFxcfCE?e=YdxhbS'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBaL7fztE0vSqh3Qd8JRHGaAeDamfOLj-djJWqmh8bElIQ?e=xogP8m'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDOe2szJPmyQp4SeHNty8xSAQY9_160Fd43_Y2xZq0gRrs?e=oF912q'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBphq7lH9WpSLEZW6cBeivHAWLhYmL8FnagyZW2wHvGtmE?e=hCdOrO'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCHkb4W00kmQabPrbaffA1AAToa4xXR0gms8MQY1mFhPrI?e=rfI5Zh'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBNmHLwrXWFSrXqcO6J_RvXAZD5M4b_mG3BlsWx0BV3Eow?e=OPRfpc'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDLSwDwKznTT7BgWX77ciRTAYi3uAJGZgujZrgPZJziCgM?e=atWk7s'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAA4jc8zDnlSo2oH8nN9ibeASsTY-4MvK9IQvlKvISG5XQ?e=AoIVbH'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBlU92hzCeaQqF5-Ya7WWmAAS4d5zI8gliB3zw0g-TBKY4?e=CSRWMs'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgD9lhhSoVn_QLuiFZk5Bhp6AY59BRHYBIzpGNMueRmn3-Q?e=HJ56eO'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCPhZYcxU7lSLUjO7SICA_6Ab3eqm34cQNkoedxokFpF1A?e=rVkLuZ'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAA08-YggBiS4ra_iTQg-xpAcKC4SK7Mw1EW5joUry76Kk?e=asgSdD'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDmrn46Ty2ITJc0PKlZaQVoAbT4QtUfPnkK1g2hcDlHC0I?e=6PhY7I'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDWknu4clJsRbG1jRbct7QlAR0d3DMBRFPU74jg8luoRq4?e=mGleb0'}
+        ]},
+        {label:'00 - EISA Past Paper Index.docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQAxJdiZVx3WQbJeoPqOYWYiAWdDTtEflv2yAfOvV62sN6g?e=rqpfqf'}
+      ]
+    },
+    {
+      title:'Prospectus',
+      root:{label:'00 Prospectus', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAubMDaLf12Sp-SGllG_3L9Ac46dLwtn061sWLBbLeWEe8?e=MRRoIi'},
+      items:[
+        {label:'EDUCASURE Prospectus 2026-2027 (Comprehensive).docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQBlz3Ph9GmdQpvUUchb0INtARPbBp8teZRutvzg-rzu88g?e=A3lLvA'}
+      ]
+    },
+    {
+      title:'Quality Assurance',
+      root:{label:'00 Quality Assurance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgATiCbYzE8KQ7khdREQ5vZnAYyjQyYFbPHXqZyr7vbbGTg?e=nJddh0'},
+      items:[
+        {label:'Curriculum documents', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDdPolFqsSMQoZydu-mTnb5AUALc-ihNWsCC_bjdxrJfG8?e=jpK57i'},
+        {label:'Assessment Weighting Policy & Audit Record (2026).docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQAcKEosaseWSoS9Zwo2nPavAV1_zoa4Ier2-Yo2FMEBZlA?e=VYfWTR'},
+        {label:'Curriculum Verification Register (August 2026).docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQBydySJom6KSp3Q83GLEg_0AfOhu-yI2QRLln1tWXm4X1k?e=kST7WA'}
+      ]
+    },
+    {
+      title:'Learner & Facilitator Support',
+      root:{label:'00 Shared - Learner & Facilitator Support', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCklPjzIGwoRZpSF_me0yTyAToBu-XpsROQU0rbTAg7jPg?e=Rq01CT'},
+      items:[
+        {label:'Class and Module Feedback (Learner).docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQCaRAt4JDkbTrMANUNU-zBwASobBk3LzFneGipiFToKgnQ?e=D8FM4M'},
+        {label:'Class Attendance Register (Learner).docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQCrCqxyPArLR4FLEXVlyygRAUlPeVJ38jEgUpcXDLLozDw?e=oNk6oS'},
+        {label:'Consolidated Facilitator Pack (Master).docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQDmEQJuo11MR5YElJ1_Vke7ASdUHt0rDNz4nSgTGxcNHXk?e=ffkYnU'},
+        {label:'Facilitator Feedback Report (Materials & Class).docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQCpYHMvS_azR7Lalii1MG8vASNnxCmNDL6ZC3qEyu0tTG0?e=CQfpiJ'},
+        {label:'How to Use EduPortal - Facilitator Guide.pdf', url:'https://educasurework.sharepoint.com/:b:/s/EducasureSharepoint/IQDTATQilLj7S6Lh62YVlgy3Af5WnLQartf6kpvuyb2sbmM?e=pQA7Ny'},
+        {label:'How to Use EduPortal - Learner Guide.docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQAcvEuiTp3qTIkiM5IH5dBGAeb9zkM9oMyxezkEtIzTwGc?e=bwgmze'},
+        {label:'Learner Attendance Register and Class Feedback.docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQCtZH3S94wOQ5JwDBRI4WAfAdKa1XIMO1EMS4X0Hq09oto?e=eoUhfd'}
+      ]
+    },
+    {
+      title:'Templates & Planning',
+      root:{label:'00 Templates & Planning', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC__ZaX6V3NTI9qpVJcxd_sAV6J2PM4R08BUUKF1sz0rb0?e=H7BePN'},
+      items:[
+        {label:'Annual Training and Assessment Calendar (FY2026-27).xlsx', url:'https://educasurework.sharepoint.com/:x:/s/EducasureSharepoint/IQDF6VuLqm4iSJwU4GuwkwM5AZSPj7bUNcAtK0n_8D5SaOY?e=veY3AV'},
+        {label:'Programme Roll-out Plan (Learner & Employer Copy).docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQDROGUG-w1JS7fCXCen_KSpAfDfZLHhChPFFmMnyf61eXo?e=OlqO5r'},
+        {label:'Roll-out & Implementation Plan TEMPLATE (2026-2030).xlsx', url:'https://educasurework.sharepoint.com/:x:/s/EducasureSharepoint/IQBVpckYV0EpSbGrf4_qOKqBAYiMggAFrdtWA3o3dI8d50I?e=LK8TlZ'}
+      ]
+    },
+    {
+      groupHeading:'Course Materials by Qualification',
+      groupNote:'Where all learning materials, knowledge modules (KM), practical modules (PM), workplace modules (WM) and textbooks live — facilitator materials are filed under each course individually.'
+    },
+    {
+      title:'INSETA', sub:true,
+      root:{label:'01 INSETA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgD6E4Yk6z83SqSLoDHXvbroAd9t6cwDNZ5IPWTohfzHuco?e=761uIw'},
+      items:[
+        {label:'105021 Investment Adv', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC33H-kWovDSbfOxN2Q-wl1AafBAzBXun4x7s15soYBm2Y?e=mUvm1w', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCaWkRExc2kQppCvOgoH9yLASV3AaBJ4KmeO2m0g4ALtts?e=JYCvXx'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgARGTAh1W1YRq69rb21wX5wAYPKlbsf-RCqf04k8cTc4JM?e=NpPI0m'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB_jQ0NTYvwT6KlFGEDxKheAcwBsXtyCjZpx2832MjUVjw?e=46dO0V'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBQ322BRl9dQ6RHGFpPlyUbATEjXtRsoiGnSsnFPvcv-uY?e=qqhIj5'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCGAI_bgs62Q66GGTzvmEP5AThrRFEGEAMNcuyOKZt0Dfo?e=ndbEeY'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBI3IvuOsNOQ5IJqaUeCY-TARJDjLDZYiu-MSyZxbeLviY?e=9ZGxwu'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA01P_i6VnNR6_WZ1Wn0_xMAQTJqk4DS5UQ-VjGR0ZDMOQ?e=DtRr2E'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCKueNDD0bbQahEVVUG4Sg3AVSR8HsSYtPxPepajVvdwdo?e=YSeX6u'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBEidOt0cROQqQBJTqeJktMAQfaOTk-PTmS3gEpq94tiyg?e=pIP2W6'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBlhYqDiox9S6_TLctT8VPOAb0kIQuii3JFA-JBdB7Gnyg?e=bgXpne'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAeRVoUwKZzRYVG89-LDJxQAXsXS_jH7YatxemqNq-ac0o?e=lk1Yyv'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAP4B_r_bHeQYsQMPPaS-baAaXJsuLVHkC06n6HaBaKUpg?e=wYHRDQ'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA938BY6IFCSo1V_PFY7hPLATSONGuJ-R-tHphuR8bWS30?e=nnhiYe'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC7sfnfVGCPS7--vJBAaBVCATKoACXQqK_TKfj3LisfEL0?e=XzSYoP'}
+        ]},
+        {label:'105022 LTI Adviser', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDGlfJVRgZqTJ2uF0vOoU6zAZz9IRNYC5b7jcBij2ng4LI?e=QCqmIQ', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDjG7jBBUrLRIps1EfdC8MLATgl1GZN_FqayPVjmj0UwJc?e=npSob3'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDYzPVBtWPZTLFTV_GhckzIATEEAsHjcDT5B9oqwsxPmx0?e=57SQUk'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBvgYcSCU43SZbCR2VMFm13Aa6EQMIizf-JdiVjfu7tJPI?e=7cmkcB'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCEjKyygBlUQLzSgkXuCvg9AbfyNlwy8R4avQ2Giu96fK8?e=bDcTyI'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCfDjUjmvEHSZpEyoNvjSduAX2nmMH6hfMpeHL-DUegLT8?e=7BXgf9'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC0f-RFrbaBRboEGPkLS0oTAeYMq-KzaGpKoHkdj2uuad8?e=gkguA2'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCzexTVb8I5RpcwPbG_IhBnAShCTr_8umx0L-3IhAGuYng?e=7VZyXA'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCcczXPQ-MdTY1Ai-b2AgqMAfekIEiZz6-QSJqps2bZPFA?e=caELsZ'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDouHA6iet5QKIzeLCswOl6Afr_eh5UPw8y29gNqr1bctk?e=pbB9QI'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBKfFF81nC7QKgNzcYbUH-4AWlIpj3-8SmuEhC2hdS2QA0?e=BcYeHA'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDqeygXe76gQ6wmoZiIootqAafq5IB4wE1yy6oeanawVdw?e=nC9LUj'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDqsU6EbSZHSb1fJvgw18sbAZz7k7_lBw9ZFRa_AwOa8Ho?e=UBxuja'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCSoUJnmkcYTqyUWgwPe6raAXt6FJtfYr7Q8cwBRG12TFM?e=vT63ZE'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAaHg2lWZXsSZFDyhPXgItmAYd-HLG8PFDjCXia9cc7Uw0?e=fqoU2E'}
+        ]},
+        {label:'105025 EPFB Adviser', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBbWCSWkgowQq82bxRzEQljAWnnhE8rKcB1BATy7jLBxIo?e=kxtGWh', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA_HByW5hG8RbHYqsIOh_5AAWt22P4tOsb0oeMoh_U01pg?e=R0ktKG'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDNA3ptExUeSokHooWjxXndARusOiN_ntI4gE1eSubekpg?e=wpvK1a'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDwK_PnAuYPToDdJPtF4LUJATamObDL9wFbgfd5XvacW2Y?e=fPGJdZ'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBSVhtEq-yVQI3mJ2H7v43eAUZGsXieHDyrSZpRZ1oxj30?e=RigtYv'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBEUjlRqfqcTaf74QJLQUuFAU-8MumogyxTaeAkqubiUcU?e=Aw1d8q'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBvS08QjROES4fqwdDAxma0ARPlbqZ6EhfEBYXLZQwx74E?e=2DxRDh'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA7Vj12c_McSYmdPsZS31v3ASBL1LwQLaGs1t4XN6hE4BY?e=9pGkOo'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCF2DXQUpRqR6Q3ugAm8y9oAbX-jZpkHJKAR4WCWmFdLwY?e=GVs0vg'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAB_nLf8u-DTKP0GyIdPGELAfCkvnidGlNyVD72uE-Ki5Q?e=Ybs17Y'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDvTefzQTO3RLYfMmT74sDhARHuk9M8gWPb9wftM6EXDlI?e=trSUgf'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDVwtYxDyv3Tbt6z2iCJAyBAUuf4vbwEed4iI3bHkxvYC4?e=XtbVcE'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCUje_UBdNURJ5Pb1ye-fxbAbNPi8TrVW_KA-oI1Z_KN3I?e=9nOznT'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBpBj6tP3zaT7KrqMThHmH8AWJm5EYJ8mNl38DAgaDd_pE?e=yJa6vr'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC9j_UrizwdSYTf6_W5-LWFAan6L31s3dcxqBerfnK4WNg?e=Yjs2VU'}
+        ]},
+        {label:'105030 HC Adviser', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDBa7rX-2ImQbBKupBpdF9LAWQZNOrPt-xAWXiSq7GXEKY?e=HpeKwL', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBML4R4E6hKRIjKj8vPY6U4AZg_s8A0FXzEmZ8PMOpN2rU?e=DtSAXx'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgByWB_6HZYsTLh1nROlBJhgAb5fuPnEmrN_DCeGkD5JsTs?e=9681AS'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBikcUUcCMjRaEKUQ9PcGNdAeg1DBEeP4sQJXJJEjkoKcg?e=H4Ptav'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBriEatK-NYSbAOlQyj8bHzAaiF1BLa6sM7651NL-Vg1G0?e=uoois5'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC6QZ4lJx5FRovxuFqFYv-GARNyS-pSQWuV4qdHKDRPs1g?e=wUJtjd'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCyZdwsZDioS6SkcFt5-QXjARtLICAZEcl64WNuMIFAQ-0?e=VkdbB1'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAhP9j62ivLTqeRc816qN16AXSHwP0jKRx1B_GzsbWynW8?e=Hy8X3b'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBO9fwToU2tQ5VopGDRHqpqAd1a0ln0pZSl1-0aQ0tFzdE?e=KFZSOb'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBnoomeJEPRQZLbyLNa_0pgAe5PCrdmc3kzn4nMe3Eysys?e=kuo53V'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB0lrdNF5FASbu77nWdxL4RAf-UBlI_eGwWrNrZ6YjGTXM?e=mm73R3'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAFNswhF9JdSYp3t0MvaRmlAckNBQoxps8YT3QJTzswDdA?e=bbZJdh'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC_dKxKuUvkQ6gKfqTGc_y_AUhO63klP2am7hSTtEaKEfs?e=YLH8ju'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAKflt-jHP2RKc8xn_2vZ6EASdN3R9jtIXOlNbTU0yefTw?e=qlbteR'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgD70BxpKO1yR5ZPOQ363KwYAfqCQ9l2_kg72SwObVycVcI?e=Wyt5L3'}
+        ]},
+        {label:'117329 Underwriter', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAE49usDf-WSLcpSVfslToAAVU2pYcGHVHjjdt1-_zgM5I?e=oIbBhp', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC5Twg5hKn_RoIPhplcN8QCAfL4zxgFbVSechu90mG-VrQ?e=GJjHaJ'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA1ZEZwd869RIEmhHXgpvCbAUCets-diZ5Mjopq9DJxCA4?e=6gjUgf'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDahpRVhiTCTJn0SWG5fE-qAZhimGVhlSEmLAO-fRK_tkU?e=ek5Bqv'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB0GKrSTeUkQrtAotwd0Sy0ARP-w454F5ArhZbeDbcLYeU?e=4hECE7'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDmZY5keLbvR4NgUAfFYSIZAQVINJwgM0xMdrVb-5ZgF2M?e=bYltAk'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDrLBisHAdhRaFY5bbwxfOuARVlSqlXzPDKiNzaAjUVBmE?e=i92jeu'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBQfQGqe8WVRrIB_HEWWNreAYJVCmp08bRJpJjMY4kVoA4?e=sl124w'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB68CYMwIUAR6Wi2KoMKzmRAfU5zLqfMaUoxt1VvECA36U?e=fhv9Jr'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAnPIZt-dCCR5a7MN-SCZXTAZMeAtLDMNryT-t95QZNnAw?e=WCqc84'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgB7QMtker4BQprkV6aT0jB4AW8Xsi6i4cPo-SpbL6pp5zc?e=ikV8oR'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAERSPL8Z0-RaohubJ-vbxtAZnPdTA_LDGTwVPIcNesCS8?e=93hEDr'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDsns1qz3-jTrTRwlI8AM6eAamKzOPuoCqd5i-gYzoNgq0?e=LMPmfM'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDDM_DWOdtQQp4eUlNevJ5vAY_Nyyv5DSHfRlhvjmOA50A?e=cC6hqr'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBI_1HaDLoVRq415tQ9fyopAb3L9XXKlMJt9i0xUd1t-vc?e=n6LjDG'}
+        ]},
+        {label:'99668 Claims Assessor', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgD7upzmMfQLS5Xn-FeFcHquAaDjmGZCyOa8KQRbeWevNrU?e=7Z3Lyh', children:[
+          {label:'1 Programme', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgA2tT9dK6cAQ4e7rWjtLhuoAZj7sUjbFEX7ncJ8AFxcfCE?e=YdxhbS'},
+          {label:'2 Guides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBaL7fztE0vSqh3Qd8JRHGaAeDamfOLj-djJWqmh8bElIQ?e=xogP8m'},
+          {label:'2 Knowledge Modules (KM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDOe2szJPmyQp4SeHNty8xSAQY9_160Fd43_Y2xZq0gRrs?e=oF912q'},
+          {label:'3 Formative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBphq7lH9WpSLEZW6cBeivHAWLhYmL8FnagyZW2wHvGtmE?e=hCdOrO'},
+          {label:'3 Practical Modules (PM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCHkb4W00kmQabPrbaffA1AAToa4xXR0gms8MQY1mFhPrI?e=rfI5Zh'},
+          {label:'4 Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBNmHLwrXWFSrXqcO6J_RvXAZD5M4b_mG3BlsWx0BV3Eow?e=OPRfpc'},
+          {label:'4 Workplace Modules (WM)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDLSwDwKznTT7BgWX77ciRTAYi3uAJGZgujZrgPZJziCgM?e=atWk7s'},
+          {label:'5 EISA & Consolidated Summative', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAA4jc8zDnlSo2oH8nN9ibeASsTY-4MvK9IQvlKvISG5XQ?e=AoIVbH'},
+          {label:'5 Practical', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBlU92hzCeaQqF5-Ya7WWmAAS4d5zI8gliB3zw0g-TBKY4?e=CSRWMs'},
+          {label:'6 Compliance, PoE & Matrices', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgD9lhhSoVn_QLuiFZk5Bhp6AY59BRHYBIzpGNMueRmn3-Q?e=HJ56eO'},
+          {label:'6 EISA', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCPhZYcxU7lSLUjO7SICA_6Ab3eqm34cQNkoedxokFpF1A?e=rVkLuZ'},
+          {label:'7 Compliance', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAA08-YggBiS4ra_iTQg-xpAcKC4SK7Mw1EW5joUry76Kk?e=asgSdD'},
+          {label:'7 Facilitator Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDmrn46Ty2ITJc0PKlZaQVoAbT4QtUfPnkK1g2hcDlHC0I?e=6PhY7I'},
+          {label:'8 Slides', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDWknu4clJsRbG1jRbct7QlAR0d3DMBRFPU74jg8luoRq4?e=mGleb0'}
+        ]}
+      ]
+    },
+    {
+      title:'Services', sub:true,
+      root:{label:'02 Services', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgD_fnt2xRerQJfbjPBEyrfmAVG_SDe_N2srrXpeLHaHSqk?e=qTccOb'},
+      items:[
+        {label:'101876 Mgmt Assistant', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCMqythyOOTS4rtN3vXnNC8AetMjlxJC7DeHK-5yT8rJO8?e=W5D4y9'},
+        {label:'118706 Marketing Coord', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCPJi42YJHRR7Z3tkesHOyTAR_hCl23-Nnvx4wv7eAkPD8?e=oky5AW'},
+        {label:'118741 SB Consultant', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDgC3HXMf5UTI_KZgiqm8RSAeocVXFboHqS-jDiCzJr1Sc?e=gEHPwb'},
+        {label:'Digital Content Creation', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDqt3SeV4FSSpnoW5QYdygxAaQKEFgoHMeRdL2EIA8TPc0?e=ItwBvT'}
+      ]
+    },
+    {
+      title:'Agri', sub:true,
+      root:{label:'03 Agri', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDHMVKWBeCESqKNTA0WsdsmASQkuaBwRF1NNkIRlbZFaV8?e=wRDdDA'},
+      items:[
+        {label:'99253 Livestock', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDzZSmqreMLRo9tFyQtmyG3ATVQ4hicNKuh-YL0O8N46xI?e=xjgahC'},
+        {label:'99256 Crop Analyst', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBHB31z1q4rTJa0V0Bd_7NDAS_Kx6VeYY89A6PMKy-nClQ?e=apeMzR'}
+      ]
+    },
+    {
+      title:'Regulatory Training (RE)', sub:true,
+      root:{label:'04 Regulatory Training (RE)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCLtOfUq2nIQa-LQjLg5QY4AdLKm7J2Bmq61eeJTWMkYTI?e=fQBgDa'},
+      items:[
+        {label:'00 Programme & Administration', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgD8Q0uqwh5cS4MdkAn5-AdOAYoB8AjhtMaGD_p9_vyF0IE?e=mpMztG'},
+        {label:'99 Question Bank (master)', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgDDMk2Eg_UxS503VA78J1yXAcFtlMSJF732tvKsWzgKKxQ?e=S1KIFm'},
+        {label:'Facilitator Pack RE5', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgC25sarAuSQTbePfBfvE3IqAVsTCyFUr9J7aZWeMEabTyo?e=7weuKW'},
+        {label:'RE1 - Key Individuals', note:'Learner materials, facilitation slides, mock examinations & MCQs.', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgCcknfPllktQYiJBmNaCsJNAT7UFstnOcuAobn2Gz__FSg?e=YIRCjI'},
+        {label:'RE5 - Representatives', note:'Learner materials, facilitation slides, mock examinations, MCQs & textbooks.', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBs7YKDFz9eR7pdMRVUY5dhAd5mzjfOcZv6LaTOZk1oU_E?e=qRaQlm'}
+      ]
+    },
+    {
+      title:'Learner Management & Records',
+      root:{label:'06 Learner Management & Records', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgAn4oVND63OQoZkm5locrkMAZzHRMYVXGEY_mRkmzQDFTo?e=qKrvaR'},
+      items:[
+        {label:'Learner, Attendance, LMS & Data Registers.xlsx', url:'https://educasurework.sharepoint.com/:x:/s/EducasureSharepoint/IQChhEP-MH9oS5tU8ODstWC9AVSznZ7WB9ioLVfNJaiEQiQ?e=dBRYvX'}
+      ]
+    },
+    {
+      title:'Work Integrated Learning',
+      root:{label:'07 Work Integrated Learning', url:'https://educasurework.sharepoint.com/:f:/s/EducasureSharepoint/IgBlH3SDEsC2RJ3_gsY8kRC8AdjZ-UCJgda61MIWJV_QakU?e=FBhscF'},
+      items:[
+        {label:'Workplace Logbook - 101876 (2026 edition).docx', url:'https://educasurework.sharepoint.com/:w:/s/EducasureSharepoint/IQCuKs6_VtgeQK1UUdFNMOugAYJz4O0oPj0MO2bPYvBox_Y?e=TMDXHt'}
+      ]
+    }
+  ];
+
+  const quickGrid = document.getElementById('quickGrid');
+  QUICK.forEach(q=>{
+    const a = document.createElement('a');
+    a.className='quick-card'; a.href=q.url; a.target='_blank'; a.rel='noopener';
+    a.innerHTML = `<div class="qc-top">${ICONS[q.type]}<span class="qc-title">${q.label}</span></div><div class="qc-desc">${q.desc}</div>`;
+    quickGrid.appendChild(a);
+  });
+
+  const sectionsEl = document.getElementById('sections');
+  let allItemEls = [];
+
+  SECTIONS.forEach(sec=>{
+    if(sec.groupHeading){
+      const gh = document.createElement('div');
+      gh.className='group-heading';
+      gh.innerHTML = `<h2>${sec.groupHeading}</h2>`;
+      sectionsEl.appendChild(gh);
+      if(sec.groupNote){
+        const p = document.createElement('p');
+        p.className='group-note';
+        p.textContent = sec.groupNote;
+        sectionsEl.appendChild(p);
+      }
+      return;
+    }
+    const det = document.createElement('details');
+    det.className='section-card';
+    if(sec.open) det.open = true;
+
+    const summary = document.createElement('summary');
+    summary.className='section-summary';
+    summary.innerHTML = `${ICONS.folder}<span>${sec.title}</span>
+      <span class="item-count">${sec.items.length} item${sec.items.length===1?'':'s'}</span>
+      ${sec.root ? `<a class="root-link" href="${sec.root.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">Open folder ↗</a>` : ''}
+      <span class="chev">›</span>`;
+    det.appendChild(summary);
+
+    const list = document.createElement('div');
+    list.className='item-list';
+    sec.items.forEach(it=>{
+      if(it.children && it.children.length){
+        const group = document.createElement('div');
+        group.className='item-group';
+        const head = document.createElement('div');
+        head.className='item-group-head';
+        head.innerHTML = `${ICONS.folder}<span class="item-group-label">${it.label}</span><a class="root-link small" href="${it.url}" target="_blank" rel="noopener">Open ↗</a>`;
+        group.appendChild(head);
+        const body = document.createElement('div');
+        body.className='item-group-body';
+        it.children.forEach(ch=>{
+          const type = typeFromUrl(ch.url);
+          const a = document.createElement('a');
+          a.className='item-link child-link'; a.href=ch.url; a.target='_blank'; a.rel='noopener';
+          a.dataset.search = (it.label + ' ' + ch.label).toLowerCase();
+          a.innerHTML = `${ICONS[type]}<span class="item-text"><span class="item-label">${ch.label}</span></span>`;
+          body.appendChild(a);
+          allItemEls.push({el:a, parent:det, group:group});
+        });
+        group.appendChild(body);
+        list.appendChild(group);
+      } else {
+        const type = typeFromUrl(it.url);
+        const a = document.createElement('a');
+        a.className='item-link'; a.href=it.url; a.target='_blank'; a.rel='noopener';
+        a.dataset.search = it.label.toLowerCase();
+        a.innerHTML = `${ICONS[type]}<span class="item-text"><span class="item-label">${it.label}</span>${it.note? `<span class="item-note">${it.note}</span>`:''}</span>`;
+        list.appendChild(a);
+        allItemEls.push({el:a, parent:det});
+      }
+    });
+    det.appendChild(list);
+    sectionsEl.appendChild(det);
+  });
+
+  const search = document.getElementById('search');
+  const resultCount = document.getElementById('resultCount');
+  search.addEventListener('input', ()=>{
+    const q = search.value.trim().toLowerCase();
+    let visible = 0;
+    const openParents = new Set();
+    allItemEls.forEach(({el,parent})=>{
+      const match = !q || el.dataset.search.includes(q);
+      el.hidden = !match;
+      if(match){ visible++; openParents.add(parent); }
+    });
+    document.querySelectorAll('details.section-card').forEach(d=>{
+      if(q) d.open = openParents.has(d);
+    });
+    document.querySelectorAll('.item-group').forEach(g=>{
+      const anyVisible = Array.from(g.querySelectorAll('.child-link')).some(el=>!el.hidden);
+      g.hidden = q ? !anyVisible : false;
+    });
+    resultCount.textContent = q ? `${visible} match${visible===1?'':'es'}` : '';
+  });
+})();
+</script>
+
+
+</body>
+</html>
